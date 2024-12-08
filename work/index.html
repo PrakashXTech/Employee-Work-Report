@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>T Skill Foundation - Employee Work Report</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: #f4f4f9;
+      }
+
+      header {
+        background-color: #007bff;
+        color: white;
+        padding: 15px;
+        text-align: center;
+      }
+
+      .container {
+        max-width: 800px;
+        margin: 20px auto;
+        background: white;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      }
+
+      .buttons {
+        display: flex;
+        justify-content: space-around;
+        margin-bottom: 20px;
+      }
+
+      button {
+        background-color: #007bff;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 16px;
+      }
+
+      button:hover {
+        background-color: #0056b3;
+      }
+
+      label {
+        display: block;
+        margin-bottom: 5px;
+        font-weight: bold;
+      }
+
+      input,
+      textarea {
+        width: 100%;
+        padding: 10px;
+        margin-bottom: 15px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+      }
+
+      table th,
+      table td {
+        border: 1px solid #ddd;
+        padding: 10px;
+        text-align: left;
+      }
+
+      table th {
+        background-color: #007bff;
+        color: white;
+      }
+
+      .action-buttons {
+        display: flex;
+        gap: 5px;
+      }
+
+      .icon-button {
+        background: none;
+        border: none;
+        cursor: pointer;
+        font-size: 16px;
+        padding: 5px;
+      }
+
+      .icon-button.edit {
+        color: #28a745;
+      }
+
+      .icon-button.delete {
+        color: #dc3545;
+      }
+
+      @media (max-width: 600px) {
+        .container {
+          padding: 15px;
+        }
+
+        button {
+          width: 100%;
+          margin-bottom: 10px;
+        }
+
+        .buttons {
+          flex-direction: column;
+          align-items: center;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>T Skill Foundation</h1>
+    </header>
+    <div class="container">
+      <div class="buttons">
+        <button id="reportBtn">Report</button>
+        <button id="viewReportBtn">View Reports</button>
+      </div>
+
+      <div id="reportSection" style="display: none">
+        <h2>Submit Your Work Report</h2>
+        <form id="reportForm">
+          <label for="name">Name:</label>
+          <input type="text" id="name" placeholder="Enter your name" required />
+
+          <label for="mobile">Mobile Number:</label>
+          <input
+            type="tel"
+            id="mobile"
+            placeholder="Enter your mobile number"
+            pattern="[0-9]{10}"
+            required
+          />
+
+          <label for="tcName">TC Name:</label>
+          <input
+            type="text"
+            id="tcName"
+            placeholder="Enter your TC name"
+            required
+          />
+
+          <label for="description">Description:</label>
+          <textarea
+            id="description"
+            rows="5"
+            placeholder="Describe your work"
+            required
+          ></textarea>
+
+          <button type="submit">Submit</button>
+        </form>
+      </div>
+
+      <div id="viewReportSection" style="display: none">
+        <h2>Admin: View All Reports</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Mobile Number</th>
+              <th>TC Name</th>
+              <th>Description</th>
+              <th>Date & Time</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="reportTableBody"></tbody>
+
+          <footer
+            style="
+              text-align: center;
+              background-color: #007bff;
+              color: white;
+              padding: 5px;
+              position: fixed;
+              bottom: 0;
+              width: 50%;
+            "
+          >
+            <p>
+              &copy; T Skill Foundation, Website created by Mr. Prakash Sharma
+            </p>
+          </footer>
+        </table>
+      </div>
+    </div>
+
+    <script>
+      const reportBtn = document.getElementById("reportBtn");
+      const viewReportBtn = document.getElementById("viewReportBtn");
+      const reportSection = document.getElementById("reportSection");
+      const viewReportSection = document.getElementById("viewReportSection");
+      const reportForm = document.getElementById("reportForm");
+      const reportTableBody = document.getElementById("reportTableBody");
+
+      // Toggle Sections
+      reportBtn.addEventListener("click", () => {
+        reportSection.style.display = "block";
+        viewReportSection.style.display = "none";
+      });
+
+      viewReportBtn.addEventListener("click", () => {
+        viewReportSection.style.display = "block";
+        reportSection.style.display = "none";
+        displayReports();
+      });
+
+      // Save Report to Local Storage
+      reportForm.addEventListener("submit", (e) => {
+        e.preventDefault();
+        const name = document.getElementById("name").value.trim();
+        const mobile = document.getElementById("mobile").value.trim();
+        const tcName = document.getElementById("tcName").value.trim();
+        const description = document.getElementById("description").value.trim();
+
+        if (!name || !mobile || !tcName || !description) {
+          alert("Please fill in all fields correctly.");
+          return;
+        }
+
+        const dateTime = new Date().toLocaleString();
+        const reports = JSON.parse(localStorage.getItem("reports")) || [];
+        reports.push({ name, mobile, tcName, description, dateTime });
+        localStorage.setItem("reports", JSON.stringify(reports));
+
+        alert("Report submitted successfully!");
+        reportForm.reset();
+      });
+
+      // Display Reports in Admin Section
+      function displayReports() {
+        const reports = JSON.parse(localStorage.getItem("reports")) || [];
+        reportTableBody.innerHTML = "";
+
+        reports.forEach((report, index) => {
+          const row = document.createElement("tr");
+
+          row.innerHTML = `
+          <td>${report.name}</td>
+          <td>${report.mobile}</td>
+          <td>${report.tcName}</td>
+          <td>${report.description}</td>
+          <td>${report.dateTime}</td>
+          <td>
+            <div class="action-buttons">
+              <button class="icon-button edit" onclick="editReport(${index})">✏️</button>
+              <button class="icon-button delete" onclick="deleteReport(${index})">🗑️</button>
+            </div>
+          </td>
+        `;
+          reportTableBody.appendChild(row);
+        });
+      }
+
+      // Edit Report
+      function editReport(index) {
+        const reports = JSON.parse(localStorage.getItem("reports")) || [];
+        const report = reports[index];
+
+        document.getElementById("name").value = report.name;
+        document.getElementById("mobile").value = report.mobile;
+        document.getElementById("tcName").value = report.tcName;
+        document.getElementById("description").value = report.description;
+
+        reportSection.style.display = "block";
+        viewReportSection.style.display = "none";
+
+        reports.splice(index, 1);
+        localStorage.setItem("reports", JSON.stringify(reports));
+      }
+
+      // Delete Report
+      function deleteReport(index) {
+        const reports = JSON.parse(localStorage.getItem("reports")) || [];
+        reports.splice(index, 1);
+        localStorage.setItem("reports", JSON.stringify(reports));
+        displayReports();
+      }
+
+      // Load Reports on Page Load
+      window.onload = () => {
+        displayReports();
+      };
+    </script>
+  </body>
+</html>
