@@ -55,6 +55,9 @@ This project is a web-based application for T Skill Foundation to facilitate emp
 - Adding authentication for admin access.
 - Export reports to PDF or Excel format.
 
+## Netlify Link
+https://staffworkreport.netlify.app/
+
 ---
 Thank you for using the Employee Work Report System. For queries or feedback, contact **Mr. Prakash Sharma** at T Skill Foundation.
 
